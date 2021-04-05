@@ -18,7 +18,10 @@ Certificate and Key Files
    1. Added in keystore.jks
 5. deviceCert.key - device key
    1. Added in keystore.jks
-    
+
+Few Facts about AWS IoT Core
+1. Doesn't support Retained Message Flag - true
+2. Doesn't support QoS 2 - once and exactly once
 
 **Trust Store**
 
@@ -41,4 +44,10 @@ openssl pkcs12 -export -in chain-deviceCert-rootCA_iot.crt -inkey deviceCert.key
 
 ``
 keytool -importkeystore -srckeystore keystore.p12 -destkeystore keystore.jks -srcstoretype pkcs12 -alias device 
+``
+
+**SSL Debug**
+
+``
+java -Djavax.net.debug=all -Djavax.net.ssl.trustStore=truststore-test.jks -Djavax.net.ssl.trustStorePassword=alok123 SSLPoke iot.aloksingh.info 8883
 ``

@@ -23,6 +23,7 @@ public class MqttClientService {
     public void connect() {
         boolean connected = false;
         int retryCount = 0;
+        System.out.println(mqttConnectOptions);
         while (connected == false && retryCount < connectRetry) {
             try {
                 System.out.println("connecting to MQTT broker - count: " + (retryCount + 1));
