@@ -1,13 +1,13 @@
 MQTT Client using Paho Client
 
-Implementation
+**Implementation**
 1. Connecting to AWS IoT Core Custom Domain
 2. Device Certificate Authentication
 3. Device Certificate is complete chain certificate
     1. This is required for AWS JITP to kicks in when first time connecting to MQTT Broker.
     2. Subsequent connection can be with full chain or only leaf certificate
 
-Certificate and Key Files
+**Certificate and Key Files**
 1. ca.crt - AWS IoT core custom domain CA (Private CA root certificate)
    1. Added in trustore-test.jks
 2. iot.aloksingh.info.crt - AWS IoT core custom domain certificate 
@@ -19,7 +19,7 @@ Certificate and Key Files
 5. deviceCert.key - device key
    1. Added in keystore.jks
 
-Few Facts about AWS IoT Core
+**Few Facts about AWS IoT Core**
 1. Doesn't support Retained Message Flag - true
 2. Doesn't support QoS 2 - once and exactly once
 
