@@ -49,5 +49,5 @@ keytool -importkeystore -srckeystore keystore.p12 -destkeystore keystore.jks -sr
 **SSL Debug**
 
 ``
-java -Djavax.net.debug=all -Djavax.net.ssl.trustStore=truststore-test.jks -Djavax.net.ssl.trustStorePassword=alok123 SSLPoke iot.aloksingh.info 8883
+java -Djavax.net.debug=all -Djavax.net.ssl.trustStore=truststore-test.jks -Djavax.net.ssl.trustStorePassword=***** SSLPoke iot.aloksingh.info 8883
 ``
