@@ -16,10 +16,11 @@ import java.nio.charset.StandardCharsets;
 public class JobScheduler {
 
     @Autowired
-    IMqttClient mqttClient;
+    IMqttClient mqttClient1;
 
-    @Value("${iot.publish.topic}")
-    private String topic;
+
+    @Value("${iot.publish.topic.client1}")
+    private String topicClient1;
 
     @Value("${iot.publish.qos}")
     private Integer qos;
@@ -34,11 +35,11 @@ public class JobScheduler {
         mqttMessage.setPayload("Some message".getBytes(StandardCharsets.UTF_8));
 
         try {
-            System.out.println("Publishing message");
-            mqttClient.publish(topic, mqttMessage);
+            System.out.format("[%s] Publishing message\n", mqttClient1.getClientId());
+            mqttClient1.publish(topicClient1, mqttMessage);
         } catch (MqttException e) {
             e.printStackTrace();
         }
-
     }
+
 }

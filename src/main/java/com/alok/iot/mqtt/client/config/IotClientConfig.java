@@ -2,17 +2,13 @@ package com.alok.iot.mqtt.client.config;
 
 import com.alok.iot.mqtt.client.service.MqttClientService;
 import com.alok.iot.mqtt.client.utils.CertUtils;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Properties;
-import java.util.UUID;
 
 @Configuration
 public class IotClientConfig {
@@ -27,12 +23,38 @@ public class IotClientConfig {
     private MqttConnectOptions mqttConnectOptions;
 
     @Bean
-    public IMqttClient mqttClient() throws MqttException {
+    public IMqttClient mqttClient1() throws MqttException {
 
-        String publisherId = UUID.randomUUID().toString();
+        String publisherId = "client1";
         String iotClientUrl = String.format("ssl://%s:%s", iotHost, iotPort);
 
         return new MqttClient(iotClientUrl, publisherId);
+    }
+
+    @Bean
+    public IMqttClient mqttClient2() throws MqttException {
+
+        String publisherId = "client2";
+        String iotClientUrl = String.format("ssl://%s:%s", iotHost, iotPort);
+        MqttClient mqttClient = new MqttClient(iotClientUrl, publisherId);
+
+        mqttClient.setCallback(new MqttCallback() {
+            @Override
+            public void connectionLost(Throwable throwable) {
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+                System.out.format("[%s] Message arrived - %s - %s\n", publisherId, topic, mqttMessage);
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+
+            }
+        });
+
+        return mqttClient;
     }
 
     @Bean
@@ -52,6 +74,7 @@ public class IotClientConfig {
         mqttConnectOptions.setAutomaticReconnect(autoReconnect);
         mqttConnectOptions.setConnectionTimeout(connTimeout);
         mqttConnectOptions.setKeepAliveInterval(keepAliveTime);
+        mqttConnectOptions.setWill("home/last-will", "My Last Will".getBytes(), 1, false);
 
         Properties sslClientProperties = new Properties();
         sslClientProperties.setProperty("com.ibm.ssl.keyStoreType", keystoreType);

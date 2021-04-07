@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 public class MqttClientService {
 
     @Autowired
-    private IMqttClient mqttClient;
+    private IMqttClient mqttClient1;
+
+    @Autowired
+    private IMqttClient mqttClient2;
 
     @Autowired
     private MqttConnectOptions mqttConnectOptions;
@@ -17,8 +20,11 @@ public class MqttClientService {
     @Value("${iot.mqtt-connection-retry}")
     private Integer connectRetry;
 
-    @Value("${iot.subscribe.topic}")
-    private String topic;
+    @Value("${iot.subscribe.topic.client2}")
+    private String subsTopicClient2;
+
+    @Value("${iot.subscribe.qos}")
+    private Integer qos;
 
     public void connect() {
         boolean connected = false;
@@ -27,7 +33,10 @@ public class MqttClientService {
         while (connected == false && retryCount < connectRetry) {
             try {
                 System.out.println("connecting to MQTT broker - count: " + (retryCount + 1));
-                mqttClient.connect(mqttConnectOptions);
+                mqttClient1.connect(mqttConnectOptions);
+
+                mqttClient2.connect(mqttConnectOptions);
+                mqttClient2.subscribe(new String[] {subsTopicClient2, "home/last-will"}, new int[] {qos, qos});
                 connected = true;
                 System.out.println("connecting to MQTT broker - connected");
             } catch (MqttException e) {
@@ -40,7 +49,13 @@ public class MqttClientService {
     public void disConnect() {
         try {
             System.out.println("disconnecting to MQTT broker");
-            mqttClient.disconnect();
+            mqttClient1.disconnect();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            mqttClient2.disconnect();
             System.out.println("disconnecting to MQTT broker - disconnected");
         } catch (MqttException e) {
             e.printStackTrace();
