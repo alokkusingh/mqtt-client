@@ -1,6 +1,6 @@
 package com.alok.iot.mqtt.client.config;
 
-import org.eclipse.paho.client.mqttv3.IMqttClient;
+import com.alok.iot.mqtt.client.service.MqttClientService;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,7 @@ import java.nio.charset.StandardCharsets;
 public class JobScheduler {
 
     @Autowired
-    IMqttClient mqttClient1;
-
+    MqttClientService mqttClient1Service;
 
     @Value("${iot.publish.topic.client1}")
     private String topicClient1;
@@ -35,11 +34,15 @@ public class JobScheduler {
         mqttMessage.setPayload("Some message".getBytes(StandardCharsets.UTF_8));
 
         try {
-            System.out.format("[%s] Publishing message\n", mqttClient1.getClientId());
-            mqttClient1.publish(topicClient1, mqttMessage);
+            System.out.format("[%s] Publishing message\n", mqttClient1Service.getClientId());
+            if (!mqttClient1Service.getMqttClient().isConnected()) {
+                System.out.format("[%s] Not connected\n", mqttClient1Service.getMqttClient().getClientId());
+                return;
+            }
+
+            mqttClient1Service.getMqttClient().publish(topicClient1, mqttMessage);
         } catch (MqttException e) {
             e.printStackTrace();
         }
     }
-
 }

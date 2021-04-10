@@ -6,6 +6,11 @@ MQTT Client using Paho Client
 3. Device Certificate is complete chain certificate
     1. This is required for AWS JITP to kicks in when first time connecting to MQTT Broker.
     2. Subsequent connection can be with full chain or only leaf certificate
+4. Client Online/Offline update
+   1. Set LWT topic with a message "OFFLINE"
+   2. On connect publish to the LWT topic "ONLINE"
+   3. Before a disconnect publish to the LWT topic "OFFLINE"
+   4. On heart-beat missing from client broker will publish to the LWT topic with LWT message (OFFLINE)
 
 **Certificate and Key Files**
 1. ca.crt - AWS IoT core custom domain CA (Private CA root certificate)
