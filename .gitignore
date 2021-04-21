@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 
 ### Secure Keys ###
-deviceCert.key
+*.key
 
 ### STS ###
 .apt_generated
