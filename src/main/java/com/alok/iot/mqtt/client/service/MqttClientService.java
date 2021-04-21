@@ -24,7 +24,7 @@ public class MqttClientService {
         while (connected == false && retryCount < connectRetry) {
             try {
                 System.out.format("[%s] Connecting to MQTT broker - attempt: %d\n", clientId, retryCount + 1);
-                //System.out.println(mqttConnectOptions);
+                System.out.println(mqttConnectOptions);
                 mqttClient.connect(mqttConnectOptions);
                 System.out.format("[%s] Connected: %b\n", clientId, mqttClient.isConnected());
                 mqttClient.subscribe(new String[] {subscriptionTopic, othersStatusTopic}, new int[] {qos, qos});

@@ -1,6 +1,7 @@
 package com.alok.iot.mqtt.client.config;
 
 import com.alok.iot.mqtt.client.service.MqttClientService;
+import com.alok.iot.mqtt.client.utils.CertUtils;
 import org.eclipse.paho.client.mqttv3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +18,13 @@ public class IotClient1Config {
     @Value("${iot.mqtt.port}")
     private String iotPort;
 
+    @Value("${iot.client.id.1}")
+    private String clientId;
+
     @Bean
     public IMqttClient mqttClient1() throws MqttException {
 
-        String publisherId = "client1";
+        String publisherId = clientId;
         String iotClientUrl = String.format("ssl://%s:%s", iotHost, iotPort);
 
         MqttClient mqttClient = new MqttClient(iotClientUrl, publisherId);
@@ -50,7 +54,7 @@ public class IotClient1Config {
             @Value("${iot.mqtt.auto-reconnect}") Boolean autoReconnect,
             @Value("${iot.mqtt.conn-timeout}") Integer connTimeout,
             @Value("${iot.mqtt.keep-alive}") Integer keepAliveTime,
-            Properties sslClientProperties
+            Properties sslClient1Properties
     ) {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setCleanSession(cleanState);
@@ -59,9 +63,28 @@ public class IotClient1Config {
         mqttConnectOptions.setKeepAliveInterval(keepAliveTime);
         mqttConnectOptions.setWill("home/device/client1/status", "OFFLINE".getBytes(), 1, false);
 
-        mqttConnectOptions.setSSLProperties(sslClientProperties);
+        mqttConnectOptions.setSSLProperties(sslClient1Properties);
 
         return mqttConnectOptions;
+    }
+
+    @Bean
+    public Properties sslClient1Properties(
+            @Value("${iot.keystore.type}") String keystoreType,
+            @Value("${iot.keystore.file.1}") String keystoreFile,
+            @Value("${iot.truststore.file}") String truststoreFile,
+            @Value("${iot.keystore.password}") String keystorePassword,
+            @Value("${iot.truststore.password}") String truststorePassword
+    ) {
+
+        //valid properties are {"com.ibm.ssl.protocol", "com.ibm.ssl.contextProvider", "com.ibm.ssl.keyStore", "com.ibm.ssl.keyStorePassword", "com.ibm.ssl.keyStoreType", "com.ibm.ssl.keyStoreProvider", "com.ibm.ssl.keyManager", "com.ibm.ssl.trustStore", "com.ibm.ssl.trustStorePassword", "com.ibm.ssl.trustStoreType", "com.ibm.ssl.trustStoreProvider", "com.ibm.ssl.trustManager", "com.ibm.ssl.enabledCipherSuites", "com.ibm.ssl.clientAuthentication"};
+        Properties properties = new Properties();
+        properties.setProperty("com.ibm.ssl.keyStoreType", keystoreType);
+        properties.setProperty("com.ibm.ssl.keyStore", CertUtils.getClientKeyStore(keystoreFile));
+        properties.setProperty("com.ibm.ssl.keyStorePassword", keystorePassword);
+        properties.setProperty("com.ibm.ssl.trustStore", CertUtils.getClientTrustStore(truststoreFile));
+        properties.setProperty("com.ibm.ssl.trustStorePassword", truststorePassword);
+        return properties;
     }
 
     @Bean(initMethod = "connect", destroyMethod = "disConnect")
@@ -77,7 +100,7 @@ public class IotClient1Config {
 
         MqttClientService mqttClientService = new MqttClientService();
 
-        mqttClientService.setClientId("client1");
+        mqttClientService.setClientId(clientId);
         mqttClientService.setMqttClient(mqttClient1);
         mqttClientService.setMqttConnectOptions(mqttClient1ConnectOptions);
         mqttClientService.setOfflineMessage(offlineMessage);

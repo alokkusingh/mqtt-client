@@ -3,10 +3,11 @@ MQTT Client using Paho Client
 **Implementation**
 1. Connecting to AWS IoT Core Custom Domain
 2. Device Certificate Authentication
-3. Device Certificate is complete chain certificate
+3. IoT Core broker policy was added to validate clientId against CN value in certificate subject
+4. Device Certificate is complete chain certificate
     1. This is required for AWS JITP to kicks in when first time connecting to MQTT Broker.
     2. Subsequent connection can be with full chain or only leaf certificate
-4. Client Online/Offline update
+5. Client Online/Offline update
    1. Set LWT topic with a message "OFFLINE"
    2. On connect publish to the LWT topic "ONLINE"
    3. Before a disconnect publish to the LWT topic "OFFLINE"
@@ -40,6 +41,8 @@ keytool -import -alias iot-domain -file ~/cert/IoT/new/us-east-1/domainCert/iot.
 
 **Key Store**
 
+Alok Device Certificates
+
 ``
 cat deviceCert.crt rootCA_iot.crt >chain-deviceCert-rootCA_iot.crt
 ``
@@ -49,6 +52,19 @@ openssl pkcs12 -export -in chain-deviceCert-rootCA_iot.crt -inkey deviceCert.key
 
 ``
 keytool -importkeystore -srckeystore keystore.p12 -destkeystore keystore.jks -srcstoretype pkcs12 -alias device 
+``
+
+Rachna Device Certificates
+
+``
+cat deviceCert-signedByRachna.crt rootCA_iot_rachna.crt >chain-deviceCert-rootCA_iot_rachna.crt
+``
+``
+openssl pkcs12 -export -in chain-deviceCert-rootCA_iot_rachna.crt -inkey deviceCert-signedByRachna.key -name deviceRachna > keystoreRachna.p12
+``
+
+``
+keytool -importkeystore -srckeystore keystoreRachna.p12 -destkeystore keystoreRachna.jks -srcstoretype pkcs12 -alias deviceRachna
 ``
 
 **SSL Debug**
